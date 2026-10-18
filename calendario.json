@@ -1,0 +1,101 @@
+{
+ "aggiornato": "2026-10-18",
+ "eventi": [
+  {
+   "nome": "Ecomondo",
+   "inizio": "2026-11-03",
+   "fine": "2026-11-06",
+   "impatto": "alto"
+  },
+  {
+   "nome": "REMODULA EXPO",
+   "inizio": "2026-11-17",
+   "fine": "2026-11-19",
+   "impatto": "medio"
+  },
+  {
+   "nome": "IBE Intermobility Future Ways",
+   "inizio": "2026-11-24",
+   "fine": "2026-11-26",
+   "impatto": "medio"
+  },
+  {
+   "nome": "SIGEP WORLD",
+   "inizio": "2027-01-23",
+   "fine": "2027-01-27",
+   "impatto": "alto"
+  },
+  {
+   "nome": "PESCARE SHOW",
+   "inizio": "2027-02-12",
+   "fine": "2027-02-14",
+   "impatto": "medio"
+  },
+  {
+   "nome": "BBTech Expo",
+   "inizio": "2027-02-21",
+   "fine": "2027-02-23",
+   "impatto": "medio"
+  },
+  {
+   "nome": "Beer & Food Attraction",
+   "inizio": "2027-02-21",
+   "fine": "2027-02-23",
+   "impatto": "alto"
+  },
+  {
+   "nome": "HYPE",
+   "inizio": "2027-03-10",
+   "fine": "2027-03-12",
+   "impatto": "medio"
+  },
+  {
+   "nome": "KEY",
+   "inizio": "2027-03-10",
+   "fine": "2027-03-12",
+   "impatto": "alto"
+  },
+  {
+   "nome": "MIR",
+   "inizio": "2027-04-04",
+   "fine": "2027-04-06",
+   "impatto": "medio"
+  },
+  {
+   "nome": "FIERAVICOLA",
+   "inizio": "2027-04-20",
+   "fine": "2027-04-22",
+   "impatto": "medio"
+  },
+  {
+   "nome": "MACFRUT",
+   "inizio": "2027-04-20",
+   "fine": "2027-04-22",
+   "impatto": "alto"
+  },
+  {
+   "nome": "Enada Primavera",
+   "inizio": "2027-05-04",
+   "fine": "2027-05-06",
+   "impatto": "medio"
+  },
+  {
+   "nome": "Expodental Meeting",
+   "inizio": "2027-05-13",
+   "fine": "2027-05-15",
+   "impatto": "medio"
+  },
+  {
+   "nome": "Rimini Wellness",
+   "inizio": "2027-05-27",
+   "fine": "2027-05-30",
+   "impatto": "alto"
+  },
+  {
+   "nome": "Meeting per l'Amicizia fra i Popoli",
+   "inizio": "2027-08-20",
+   "fine": "2027-08-25",
+   "impatto": "alto"
+  }
+ ]
+}

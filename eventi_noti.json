@@ -1,0 +1,101 @@
+{
+ "eventi": [
+  {
+   "nome": "Ecomondo",
+   "inizio": "2026-11-03",
+   "fine": "2026-11-06",
+   "assenze": 0
+  },
+  {
+   "nome": "REMODULA EXPO",
+   "inizio": "2026-11-17",
+   "fine": "2026-11-19",
+   "assenze": 0
+  },
+  {
+   "nome": "IBE Intermobility Future Ways",
+   "inizio": "2026-11-24",
+   "fine": "2026-11-26",
+   "assenze": 0
+  },
+  {
+   "nome": "SIGEP WORLD",
+   "inizio": "2027-01-23",
+   "fine": "2027-01-27",
+   "assenze": 0
+  },
+  {
+   "nome": "PESCARE SHOW",
+   "inizio": "2027-02-12",
+   "fine": "2027-02-14",
+   "assenze": 0
+  },
+  {
+   "nome": "BBTech Expo",
+   "inizio": "2027-02-21",
+   "fine": "2027-02-23",
+   "assenze": 0
+  },
+  {
+   "nome": "Beer & Food Attraction",
+   "inizio": "2027-02-21",
+   "fine": "2027-02-23",
+   "assenze": 0
+  },
+  {
+   "nome": "HYPE",
+   "inizio": "2027-03-10",
+   "fine": "2027-03-12",
+   "assenze": 0
+  },
+  {
+   "nome": "KEY",
+   "inizio": "2027-03-10",
+   "fine": "2027-03-12",
+   "assenze": 0
+  },
+  {
+   "nome": "MIR",
+   "inizio": "2027-04-04",
+   "fine": "2027-04-06",
+   "assenze": 0
+  },
+  {
+   "nome": "FIERAVICOLA",
+   "inizio": "2027-04-20",
+   "fine": "2027-04-22",
+   "assenze": 0
+  },
+  {
+   "nome": "MACFRUT",
+   "inizio": "2027-04-20",
+   "fine": "2027-04-22",
+   "assenze": 0
+  },
+  {
+   "nome": "Enada Primavera",
+   "inizio": "2027-05-04",
+   "fine": "2027-05-06",
+   "assenze": 0
+  },
+  {
+   "nome": "Expodental Meeting",
+   "inizio": "2027-05-13",
+   "fine": "2027-05-15",
+   "assenze": 0
+  },
+  {
+   "nome": "Rimini Wellness",
+   "inizio": "2027-05-27",
+   "fine": "2027-05-30",
+   "assenze": 0
+  },
+  {
+   "nome": "Meeting per l'Amicizia fra i Popoli",
+   "inizio": "2027-08-20",
+   "fine": "2027-08-25",
+   "assenze": 0
+  }
+ ],
+ "annullati": []
+}
