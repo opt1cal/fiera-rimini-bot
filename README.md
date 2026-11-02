@@ -1,12 +1,14 @@
 # Bot Telegram – avvisi Fiera di Rimini (IEG)
 
-Ti avvisa su Telegram quando un evento alla Fiera di Rimini sta per iniziare (default: 4 giorni prima),
+Ti avvisa su Telegram quando un evento alla Fiera di Rimini sta per iniziare (default: 4 giorni prima e di nuovo il giorno stesso),
 così sai in anticipo dove ci può essere traffico. Gira gratis su GitHub Actions, senza server.
 
 ## Come funziona
 - Ogni 6 ore legge il calendario ufficiale (https://www.iegexpo.it/en/venues/rimini/exhibitions).
 - Lo unisce a `eventi_manuali.json` (dati di riserva se il sito cambia o è offline).
-- Se un evento inizia entro 4 giorni e non è già stato notificato, invia un messaggio.
+- Per ogni evento invia due avvisi: **4 giorni prima** e **il giorno stesso dell'inizio**
+  ("OGGI"), mai ripetuti. Se un evento compare in calendario a ridosso dell'inizio parte un solo messaggio.
+  Gli avvisi di inizio partono dalle 7:00 italiane in poi, quindi non ricevi messaggi di notte.
   Gli eventi con la stessa data (es. Key + HYPE) arrivano in un solo messaggio.
 - **Nuovi eventi**: se nel calendario ufficiale compare un evento che non c'era, ti scrive subito
   ("🆕 Nuovi eventi in calendario"). Se un evento già noto cambia date, ti scrive "📝 Date modificate"
@@ -46,7 +48,11 @@ python bot.py --test                       # messaggio di prova
 ```
 
 ## Personalizzazione
-- **Anticipo**: variabile `DAYS_BEFORE` nel workflow.
+- **Giorni di anticipo**: variabile `AVVISI_GIORNI` nel workflow, elenco separato da virgole.
+  Esempi: `"4,0"` (predefinito: 4 giorni prima e il giorno stesso), `"7,2,0"` (tre avvisi), `"4"` (solo uno).
+  Sostituisce la vecchia variabile `DAYS_BEFORE`, che non viene più letta.
+- **Orario degli avvisi**: variabile `ORA_MINIMA` (ora italiana, predefinito 7). Il controllo gira ogni 6 ore,
+  quindi l'avviso arriva al primo giro utile dopo quell'ora.
 - **Impatto traffico**: la lista `RILEVANZA_ALTA` in `bot.py` è una mia stima (eventi grandi/aperti al pubblico),
   non un dato ufficiale: modificala in base alla tua esperienza.
 - **Escludere eventi**: aggiungi parole chiave in `"escludi"` in `eventi_manuali.json`.

@@ -4,7 +4,7 @@ Avvisi Fiera di Rimini (IEG) via Telegram.
 
 Ogni esecuzione:
   1. legge il calendario ufficiale IEG (scraping) e lo unisce a eventi_manuali.json
-  2. trova gli eventi che iniziano entro DAYS_BEFORE giorni e non sono già stati notificati
+  2. trova gli eventi da avvisare (di default 4 giorni prima e il giorno stesso dell'inizio)
   3. invia un messaggio Telegram (uno per ogni data di inizio) e salva lo stato
   4. pubblica calendario.json per i comandi del bot (vedi worker.js)
   5. segnala gli eventi NUOVI, quelli con date modificate e quelli ANNULLATI (spariti dal calendario)
@@ -12,7 +12,9 @@ Ogni esecuzione:
 Variabili d'ambiente:
   TELEGRAM_TOKEN     token del bot (da @BotFather)
   TELEGRAM_CHAT_IDS  uno o più chat id / @canale separati da virgola
-  DAYS_BEFORE        giorni di anticipo (default 4)
+  AVVISI_GIORNI      giorni di anticipo degli avvisi, separati da virgola (default "4,0":
+                     4 giorni prima e il giorno stesso)
+  ORA_MINIMA         ora italiana prima della quale non partono gli avvisi di inizio (default 7)
 
 Opzioni:
   --dry-run          stampa i messaggi senza inviarli e senza salvare lo stato
@@ -26,11 +28,12 @@ import json
 import os
 import re
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import requests
+from zoneinfo import ZoneInfo
 
 BASE = Path(__file__).parent
 MANUAL_FILE = BASE / "eventi_manuali.json"
@@ -168,8 +171,12 @@ def costruisci_messaggio(gruppo: list[dict], oggi: date) -> str:
         righe.append(f"📅 Da {fmt(inizio)} a {fmt(fine)}")
     righe.append(f"{icona} Impatto traffico stimato: {livello}")
     righe.append("")
-    righe.append("Possibili rallentamenti nella zona della Fiera (Via Emilia, SS16, uscita A14 Rimini Nord). "
-                 "Meglio mettere in conto più tempo.")
+    if giorni == 0:
+        righe.append("Oggi è il primo giorno: possibili rallentamenti nella zona della Fiera "
+                     "(Via Emilia, SS16, uscita A14 Rimini Nord).")
+    else:
+        righe.append("Possibili rallentamenti nella zona della Fiera (Via Emilia, SS16, uscita A14 Rimini Nord). "
+                     "Meglio mettere in conto più tempo.")
     return "\n".join(righe)
 
 
@@ -333,7 +340,7 @@ def messaggio_novita(nuovi: list[dict], modificati: list, annullati_ora: list) -
                      "Se vengono reinseriti con nuove date te lo segnalo.")
         righe.append("")
     if nuovi or modificati:
-        righe.append("Ti avviserò di nuovo qualche giorno prima dell'inizio.")
+        righe.append("Ti avviserò di nuovo prima dell'inizio e il giorno stesso.")
     return "\n".join(righe).strip()
 
 
@@ -370,14 +377,79 @@ def carica_stato() -> set[str]:
     return set()
 
 
+def data_da_chiave(k: str) -> str:
+    """Chiavi nuove: 'nome|data|anticipo'. Chiavi della versione precedente: 'nome|data'."""
+    parti = k.split("|")
+    return parti[-1] if len(parti[-1]) == 10 else parti[-2]
+
+
 def salva_stato(stato: set[str], oggi: date) -> None:
-    # tiene solo le chiavi recenti per non far crescere il file
-    recenti = sorted(k for k in stato if k.rsplit("|", 1)[-1] >= str(oggi.replace(year=oggi.year - 1)))
+    limite = str(oggi - timedelta(days=365))  # tiene solo le chiavi recenti
+    recenti = sorted(k for k in stato if data_da_chiave(k) >= limite)
     STATE_FILE.write_text(json.dumps(recenti, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def chiave(e: dict) -> str:
+    """Chiave della versione precedente: equivale all'avviso con l'anticipo maggiore."""
     return f"{e['nome']}|{e['inizio'].isoformat()}"
+
+
+def chiave_avviso(e: dict, anticipo: int) -> str:
+    return f"{e['nome']}|{e['inizio'].isoformat()}|{anticipo}"
+
+
+def parse_anticipi(valore: str) -> list[int]:
+    anticipi = sorted({int(x) for x in valore.split(",") if x.strip()}, reverse=True)
+    return anticipi or [4, 0]
+
+
+def avvisi_dovuti(eventi: list[dict], stato: set[str], oggi: date, anticipi: list[int]):
+    """Restituisce [(evento, anticipi_scattati)] per gli avvisi ancora da inviare.
+
+    Per ogni evento conta solo la fase corrente (l'anticipo più piccolo già raggiunto):
+    se l'evento compare nel calendario a ridosso dell'inizio parte un solo messaggio,
+    non uno per ogni fase saltata.
+    """
+    massimo = anticipi[0]
+    dovuti = []
+    for e in eventi:
+        giorni = (e["inizio"] - oggi).days
+        scattati = [a for a in anticipi if 0 <= giorni <= a]
+        if not scattati:
+            continue
+        fase = min(scattati)
+        gia = chiave_avviso(e, fase) in stato or (fase == massimo and chiave(e) in stato)
+        if not gia:
+            dovuti.append((e, scattati))
+    return dovuti
+
+
+def invia_avvisi(eventi, stato, oggi, anticipi, token, chat_ids, dry_run) -> None:
+    dovuti = avvisi_dovuti(eventi, stato, oggi, anticipi)
+    if not dovuti:
+        print(f"Nessun avviso di inizio da inviare (oggi {oggi}, anticipi {anticipi} giorni).")
+        return
+    gruppi: dict[date, list] = {}
+    for e, scattati in dovuti:
+        gruppi.setdefault(e["inizio"], []).append((e, scattati))
+    for inizio, gruppo in sorted(gruppi.items()):
+        testo = costruisci_messaggio([e for e, _ in gruppo], oggi)
+        if dry_run:
+            print("-" * 40)
+            print(html.unescape(re.sub(r"</?b>", "", testo)))
+            continue
+        invia_telegram(token, chat_ids, testo)
+        for e, scattati in gruppo:
+            stato.update(chiave_avviso(e, a) for a in scattati)
+        salva_stato(stato, oggi)  # salva dopo ogni invio riuscito
+        print(f"Inviato avviso per {inizio}: {[e['nome'] for e, _ in gruppo]}")
+
+
+def adesso_roma() -> datetime:
+    try:
+        return datetime.now(ZoneInfo("Europe/Rome"))
+    except Exception:  # database dei fusi orari non disponibile
+        return datetime.now()
 
 
 # ----------------------------------------------------------------------- main
@@ -386,12 +458,15 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--list", action="store_true")
-    ap.add_argument("--oggi", type=date.fromisoformat, default=date.today())
+    ap.add_argument("--oggi", type=date.fromisoformat, default=None)
     args = ap.parse_args()
 
     token = os.environ.get("TELEGRAM_TOKEN", "")
     chat_ids = [c.strip() for c in os.environ.get("TELEGRAM_CHAT_IDS", "").split(",") if c.strip()]
-    anticipo = int(os.environ.get("DAYS_BEFORE", "4"))
+    anticipi = parse_anticipi(os.environ.get("AVVISI_GIORNI", "4,0"))
+    ora_minima = int(os.environ.get("ORA_MINIMA", "7"))
+    simulata = args.oggi is not None
+    oggi = args.oggi or adesso_roma().date()
 
     if args.test:
         if not (token and chat_ids):
@@ -400,7 +475,7 @@ def main() -> int:
         print("Messaggio di prova inviato.")
         return 0
 
-    eventi, scaricati = calendario_completo(args.oggi)
+    eventi, scaricati = calendario_completo(oggi)
 
     if args.list:
         for e in eventi:
@@ -408,39 +483,20 @@ def main() -> int:
         return 0
 
     if scaricati and not args.dry_run:  # se lo scraping è fallito non sovrascrive dati buoni
-        salva_calendario(eventi, args.oggi)
+        salva_calendario(eventi, oggi)
 
     stato = carica_stato()
-    oggi = args.oggi
 
     if not args.dry_run and not (token and chat_ids):
         sys.exit("Imposta TELEGRAM_TOKEN e TELEGRAM_CHAT_IDS")
     controlla_novita(scaricati, oggi, token, chat_ids, args.dry_run)
 
-    da_avvisare = [e for e in eventi
-                   if 0 <= (e["inizio"] - oggi).days <= anticipo and chiave(e) not in stato]
-
-    if not da_avvisare:
-        print(f"Nessun nuovo evento da segnalare (oggi {oggi}, anticipo {anticipo} giorni).")
+    # Gli avvisi di inizio partono solo dalle ORA_MINIMA italiane (niente messaggi di notte);
+    # le novità del calendario invece vengono segnalate subito.
+    if not (args.dry_run or simulata) and adesso_roma().hour < ora_minima:
+        print(f"Avvisi di inizio rimandati: non sono ancora le {ora_minima}:00 in Italia.")
         return 0
-
-    gruppi: dict[date, list[dict]] = {}
-    for e in da_avvisare:
-        gruppi.setdefault(e["inizio"], []).append(e)
-
-    if not args.dry_run and not (token and chat_ids):
-        sys.exit("Imposta TELEGRAM_TOKEN e TELEGRAM_CHAT_IDS")
-
-    for inizio, gruppo in sorted(gruppi.items()):
-        testo = costruisci_messaggio(gruppo, oggi)
-        if args.dry_run:
-            print("-" * 40)
-            print(html.unescape(re.sub(r"</?b>", "", testo)))
-            continue
-        invia_telegram(token, chat_ids, testo)
-        stato.update(chiave(e) for e in gruppo)
-        salva_stato(stato, oggi)  # salva dopo ogni invio riuscito
-        print(f"Inviato avviso per {inizio}: {[e['nome'] for e in gruppo]}")
+    invia_avvisi(eventi, stato, oggi, anticipi, token, chat_ids, args.dry_run)
     return 0
 
 
