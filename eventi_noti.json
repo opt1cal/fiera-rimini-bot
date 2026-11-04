@@ -95,6 +95,24 @@
    "inizio": "2027-08-20",
    "fine": "2027-08-25",
    "assenze": 0
+  },
+  {
+   "nome": "BEX Beyond Expoloration Expo",
+   "inizio": "2027-09-15",
+   "fine": "2027-09-17",
+   "assenze": 0
+  },
+  {
+   "nome": "InOut",
+   "inizio": "2027-10-13",
+   "fine": "2027-10-15",
+   "assenze": 0
+  },
+  {
+   "nome": "TTG Travel Experience",
+   "inizio": "2027-10-13",
+   "fine": "2027-10-15",
+   "assenze": 0
   }
  ],
  "annullati": []
