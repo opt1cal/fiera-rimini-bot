@@ -113,6 +113,18 @@
    "inizio": "2027-10-13",
    "fine": "2027-10-15",
    "assenze": 0
+  },
+  {
+   "nome": "Ecomondo",
+   "inizio": "2027-11-09",
+   "fine": "2027-11-12",
+   "assenze": 0
+  },
+  {
+   "nome": "Venditalia",
+   "inizio": "2028-05-03",
+   "fine": "2028-05-06",
+   "assenze": 0
   }
  ],
  "annullati": []

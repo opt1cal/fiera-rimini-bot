@@ -108,6 +108,18 @@
    "inizio": "2027-10-13",
    "fine": "2027-10-15",
    "impatto": "alto"
+  },
+  {
+   "nome": "Ecomondo",
+   "inizio": "2027-11-09",
+   "fine": "2027-11-12",
+   "impatto": "alto"
+  },
+  {
+   "nome": "Venditalia",
+   "inizio": "2028-05-03",
+   "fine": "2028-05-06",
+   "impatto": "medio"
   }
  ]
 }
