@@ -55,6 +55,12 @@
    "assenze": 0
   },
   {
+   "nome": "Enada Primavera",
+   "inizio": "2027-03-22",
+   "fine": "2027-03-24",
+   "assenze": 0
+  },
+  {
    "nome": "MIR",
    "inizio": "2027-04-04",
    "fine": "2027-04-06",
@@ -127,5 +133,7 @@
    "assenze": 0
   }
  ],
- "annullati": []
+ "annullati": [
+  "Enada Primavera|2027-05-04"
+ ]
 }

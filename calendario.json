@@ -50,6 +50,12 @@
    "impatto": "alto"
   },
   {
+   "nome": "Enada Primavera",
+   "inizio": "2027-03-22",
+   "fine": "2027-03-24",
+   "impatto": "medio"
+  },
+  {
    "nome": "MIR",
    "inizio": "2027-04-04",
    "fine": "2027-04-06",
@@ -66,12 +72,6 @@
    "inizio": "2027-04-20",
    "fine": "2027-04-22",
    "impatto": "alto"
-  },
-  {
-   "nome": "Enada Primavera",
-   "inizio": "2027-05-04",
-   "fine": "2027-05-06",
-   "impatto": "medio"
   },
   {
    "nome": "Expodental Meeting",
